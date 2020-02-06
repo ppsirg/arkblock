@@ -40,6 +40,7 @@ falsificar o corromper la información (zero trust systems)
 de almacenamiento y recursos, así como de ancho de banda
 - los interesados del sistema se benefician de tener copias locales del sistema
 - la verificación de eventos en el tiempo es un requisito critico
+- necesitas monetizar completamente su uso
 
 ## debilidades
 
@@ -58,6 +59,7 @@ de almacenamiento y recursos, así como de ancho de banda
 
 - https://benediktkr.github.io/dev/2016/02/04/p2p-with-twisted.html
 - https://github.com/macsnoeren/python-p2p-network
+- https://www.welivesecurity.com/la-es/2018/09/04/blockchain-que-es-como-funciona-y-como-se-esta-usando-en-el-mercado/
 
 - https://medium.com/@amannagpal4/how-to-create-your-own-decentralized-file-sharing-service-using-python-2e00005bdc4a
 - https://www.youtube.com/watch?v=kXyVqk3EbwE
