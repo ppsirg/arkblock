@@ -55,6 +55,21 @@ de almacenamiento y recursos, así como de ancho de banda
 
 - buscar diferentes algoritmos de concenso
 
+## Ejemplos de protocolos de consenso (https://es.wikipedia.org/wiki/Problema_del_consenso)
+Se han elaborado distintos protocolos o algoritmos que solucionan este tipo de problemas. 
+Cada uno se aplica para cierto tipo de entornos y tienen sus propias características. Veamos algunos ejemplos:
+
+Commit de dos fases
+Commit de tres fases
+Raft
+Paxos y Multipaxos
+Prueba de trabajo
+Prueba de participación tanto en su versión original como en la versión prueba de participación delegada.
+Prueba de quemadura
+Algoritmo de consenso Protocolo Ripple. Es el usado en Ripple y Stellar
+Zookeeper Atomic Broadcast
+Viewstamped replication
+
 ## elances de interes
 
 - https://benediktkr.github.io/dev/2016/02/04/p2p-with-twisted.html
