@@ -19,13 +19,14 @@ blockchain but other nodes still will have it pending. If any node see that your
 transaction with same timestamp was added, they should remove it from the
 node_pending_transactions list to avoid it get processed more than 1 time.
 """
-
+import os
 import time
-import base64
-import ecdsa
 import json
+import ecdsa
+import base64
 from pprint import pprint
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from settings import BASE_DIR
 
 # =============================================================================
 # auxiliar function
@@ -33,7 +34,7 @@ from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
 def allowed_characters(key):
     banned = [b'+', b'/']
-    return True if set(banned).intersection(set(key)) else False
+    return False if set(banned).intersection(set(key)) else True
 
 
 def sign_ECDSA_msg(private_key):
@@ -62,7 +63,7 @@ def generate_ECDSA_keys(key_name):
     private_key: str
     public_ley: base64 (to make it shorter)
     """
-    filename =  f"{key_name}.key"
+    filename = os.path.join(BASE_DIR, key_name, f"{key_name}.key")
     while True:
         sk = ecdsa.SigningKey.generate(curve=ecdsa.SECP256k1) #this is your sign (private key)
         private_key = sk.to_string().hex() #convert your private key to hex
@@ -81,7 +82,32 @@ def generate_ECDSA_keys(key_name):
         json.dump(key_data, f, sort_keys=True, indent=4)
         print(f"Private key: {private_key}\nWallet address / Public key: {public_key.decode()}")
     print(f"Your new address and private key are now in the file {filename}")
-    return filename
+    return {
+        'name': key_name,
+        'file': filename,
+        'folder': os.path.dirname(filename),
+        'data': key_data
+    }
+
+
+def get_ECDSA_keys(key_name):
+    filename = os.path.join(BASE_DIR, key_name, f"{key_name}.key")
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            data = json.load(f)
+            print(data)
+            key_data = {
+                'private_key': data['private_key'],
+                'public_key': data['public_key'],
+            }
+            return {
+                'name': key_name,
+                'file': filename,
+                'folder': os.path.dirname(filename),
+                'data': key_data
+                }
+    else:
+        return generate_ECDSA_keys(key_name)
 
 
 def send_transaction_ui(destination_node, key_name, addr_to, amount):

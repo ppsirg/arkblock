@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
+import os
 import re
+from tinydb import TinyDB
 from tornado.web import Application, RequestHandler
-from concensus.directions import *
-from concensus.blocks import *
+# from concensus.directions import *
+from concensus.blocks import start_db
 from concensus.utilities import build_filesytem
-from tinydb import TinyDB, Query
-
 
 class chainBaseHandler(RequestHandler):
-    """docstring for chainBaseHandler."""
+    """Clase base."""
 
-    def initialize(self, node_name, dirname):
-        self.node_name = node_name
-        self.dirname = dirname
-        self.db_file = os.path.join(dirname, node_name)
+    def initialize(self, params):
+        self.node_name = params['name']
+        self.dirname = params['folder']
+        self.db_file = os.path.join(self.dirname, f'{self.node_name}.json')
         self.__range_qs__ = {
             'closed_range': re.compile(r'\d+-\d+'),
             'punctual_block': re.compile(r'\d+'),
@@ -57,22 +57,22 @@ class transactionHandler(chainBaseHandler):
         print(kwargs)
         self.write({'response': 'posted it'})
 
-# Node's blockchain copy
-BLOCKCHAIN = [create_genesis_block()]
+# # Node's blockchain copy
+# BLOCKCHAIN = [create_genesis_block()]
+#
+# """ Stores the transactions that this node has in a list.
+# If the node you sent the transaction adds a block
+# it will get accepted, but there is a chance it gets
+# discarded and your transaction goes back as if it was never
+# processed"""
+# NODE_PENDING_TRANSACTIONS = []
 
-""" Stores the transactions that this node has in a list.
-If the node you sent the transaction adds a block
-it will get accepted, but there is a chance it gets
-discarded and your transaction goes back as if it was never
-processed"""
-NODE_PENDING_TRANSACTIONS = []
 
-
-def make_app(node_name):
+def make_blockchain_app(node_name):
     # construye sistema de archivos
-    dirname = build_filesytem(node_name)
-    params = {'dirname': dirname, 'node_name': node_name}
+    params = build_filesytem(node_name)
+    start_db(params)
     return Application([
-        (r"/blocks", blockHandler, params),
-        (r"/txion", transactionHandler, params),
+        (r"/blocks/", blockHandler, params),
+        (r"/txion/", transactionHandler, params),
     ])
