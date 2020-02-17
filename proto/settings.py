@@ -9,7 +9,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 # Store the url data of every other node in the network
 # so that we can communicate with them
-PEER_NODES = ['localhost:8888']
+PEER_NODES = ['https://localhost:8888']
 
 # base_url = 'http://emdyp.pythonanywhere.com'
 # base_url = 'http://localhost:5000'

@@ -9,7 +9,7 @@ import ecdsa
 from concensus.directions import generate_ECDSA_keys, get_ECDSA_keys
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPClient
 from tinydb import TinyDB
-from miner_config import PEER_NODES
+from settings import PEER_NODES
 MINER_ADDRESS, MINER_NODE_URL = [1,2]
 
 
@@ -50,7 +50,7 @@ class Block(object):
         return {
             "index": str(self.index),
             "timestamp": str(self.timestamp),
-            "data": self.data_str,
+            "data": self.data,
             "hash": self.hash
         }
 
@@ -157,13 +157,13 @@ def start_db(filesystem_data):
             except Exception as e:
                 # si otro nodo no tiene nada, crear genesis_block
                 genesis_block = create_genesis_block()
-                db.insert(genesis_block)
+                db.insert(genesis_block.dict_repr())
             else:
                 resp_data = json.loads(response.body.decode(encoding='utf-8'))
                 if not resp_data['blocks']:
                     # si otro nodo no tiene nada, crear genesis_block
                     genesis_block = create_genesis_block()
-                    db.insert(genesis_block)
+                    db.insert(genesis_block.dict_repr())
                 else:
                     # si tiene blques, poner los bloques en mi almacenamiento
                     db.insert_multiple(resp_data['blocks'])
@@ -176,7 +176,7 @@ class NodeBlockChain(object):
     """
 
     def __init__(self, node_name):
-        self.node_url = 'localhost:5230'
+        self.node_url = 'http://localhost:5230'
 
     async def blocks(self, qs='all'):
         """all, last, n1-n2, n1-
@@ -187,7 +187,7 @@ class NodeBlockChain(object):
             res = await http_client.fetch(url)
             res_data = json.loads(res.body.decode(encoding='utf-8'))
             print(res_data)
-            return res_data
+            return res_data['blocks']
         except Exception as e:
             print(f'something wrong on send transaction: {e}')
             return None

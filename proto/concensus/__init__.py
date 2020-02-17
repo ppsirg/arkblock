@@ -10,7 +10,9 @@ from concensus.utilities import build_filesytem
 class chainBaseHandler(RequestHandler):
     """Clase base."""
 
-    def initialize(self, params):
+    def initialize(self, params, *args, **kwargs):
+        print(args)
+        print(kwargs)
         self.node_name = params['name']
         self.dirname = params['folder']
         self.db_file = os.path.join(self.dirname, f'{self.node_name}.json')
@@ -21,25 +23,28 @@ class chainBaseHandler(RequestHandler):
             'less_than': re.compile(r'-\d+'),
         }
 
+class blockHandler(chainBaseHandler):
+    """docstring for blockHandler."""
+
     def get_block(self, query=None):
         """retorna bloques del registro, puede retornar: todos, uno por id,
         y en un rango cerrado"""
+        print(f'=> abriendo base de datos en: {self.db_file}')
         with TinyDB(self.db_file) as db:
             if not query:
                 data = db.all()
+                return data
             else:
                 if self.__range_qs__['closed_range'].match(query):
                     pass
-
-class blockHandler(chainBaseHandler):
-    """docstring for blockHandler."""
+                return None
 
     def get(self, *args, **kwargs):
         print(args)
         print(kwargs)
         # serializar blockchain
-        blockchain = []
-        self.write({'blocks': blockchain})
+        response = self.get_block()
+        self.write({'blocks': response})
 
 
 class transactionHandler(chainBaseHandler):
@@ -73,6 +78,6 @@ def make_blockchain_app(node_name):
     params = build_filesytem(node_name)
     start_db(params)
     return Application([
-        (r"/blocks/", blockHandler, params),
-        (r"/txion/", transactionHandler, params),
+        (r"/blocks/(.*)?", blockHandler, {'params': params}),
+        (r"/txion/", transactionHandler, {'params': params}),
     ])

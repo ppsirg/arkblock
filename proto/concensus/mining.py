@@ -16,6 +16,7 @@ async def mining_process(node_name, *args, **kwargs):
     """
     new_block_interval = 30
     BLOCKCHAIN = NodeBlockChain(node_name)
+    block_number = 0
     while True:
         """Mining is the only way that new coins can be created.
         In order to prevent too many coins to be created, the process
@@ -26,7 +27,11 @@ async def mining_process(node_name, *args, **kwargs):
         block_number += 1
         # Get the last proof of work
         last_block = await BLOCKCHAIN.blocks(qs='last')
-        last_proof = last_block.data['proof-of-work']
+        print(f'=> last block: {last_block}')
+        if not last_block:
+            await gen.sleep(0.5)
+            continue
+        last_proof = last_block['data']['proof-of-work']
         # Find the proof of work for the current block being mined
         # Note: The program will hang here until a new proof of work is found
         proof = proof_of_work(last_proof, BLOCKCHAIN)
