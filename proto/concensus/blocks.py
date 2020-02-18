@@ -9,13 +9,12 @@ import ecdsa
 from concensus.directions import generate_ECDSA_keys, get_ECDSA_keys
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPClient
 from tinydb import TinyDB
-from settings import PEER_NODES
-MINER_ADDRESS, MINER_NODE_URL = [1,2]
+from settings import PEER_NODES, get_config
 
 
 # good
 class Block(object):
-    def __init__(self, index, timestamp, data, previous_hash):
+    def __init__(self, *args, **kwargs):
         """Returns a new Block object. Each block is "chained" to its previous
         by calling its unique hash.
 
@@ -33,12 +32,24 @@ class Block(object):
             hash(str): Current block unique hash.
 
         """
-        self.index = index
-        self.timestamp = timestamp
-        self.data = data
-        self.data_str = json.dumps(data)
-        self.previous_hash = previous_hash
-        self.hash = self.hash_block()
+        if len(args) == 4:
+            index, timestamp, data, previous_hash = args
+            self.index = int(index)
+            self.timestamp = timestamp
+            self.data = data
+            self.data_str = json.dumps(data)
+            self.previous_hash = previous_hash
+            self.hash = self.hash_block()
+        elif len(args) == 1:
+            self.index = int(args[0]['index'])
+            self.timestamp = args[0]['timestamp']
+            # import pdb; pdb.set_trace()
+            self.data_str = json.dumps(args[0]['data'])
+            self.data = args[0]['data']
+            self.previous_hash = args[0]['previous_hash']
+            self.hash = self.hash_block()
+        else:
+            raise ValueError('arguments are not valid')
 
     def hash_block(self):
         """Creates the unique hash for the block. It uses sha256."""
@@ -51,7 +62,8 @@ class Block(object):
             "index": str(self.index),
             "timestamp": str(self.timestamp),
             "data": self.data,
-            "hash": self.hash
+            "hash": self.hash,
+            "previous_hash": self.previous_hash,
         }
 
 # good
@@ -176,7 +188,9 @@ class NodeBlockChain(object):
     """
 
     def __init__(self, node_name):
-        self.node_url = 'http://localhost:5230'
+        MINER_CONFIG = json.loads(get_config(node_name))
+        MINER_NODE_URL = 'http://{host}:{port}'.format(**MINER_CONFIG)
+        self.node_url = MINER_NODE_URL
 
     async def blocks(self, qs='all'):
         """all, last, n1-n2, n1-
@@ -187,10 +201,30 @@ class NodeBlockChain(object):
             res = await http_client.fetch(url)
             res_data = json.loads(res.body.decode(encoding='utf-8'))
             print(res_data)
-            return res_data['blocks']
+            resp_blocks = [Block(a) for a in res_data['blocks']]
+            if qs == 'last':
+                return resp_blocks[0]
         except Exception as e:
-            print(f'something wrong on send transaction: {e}')
+            print(f'something wrong on async blocks: {e}')
             return None
+
+    async def add_to_chain(self, block):
+        """Add block to local chain
+        """
+        add_request = HTTPRequest(
+            f'{self.node_url}/blocks/', method='POST',
+            headers={"Content-Type": "application/json"},
+            body=json.dumps(block.dict_repr())
+            )
+        http_client = AsyncHTTPClient()
+        try:
+            resp = await http_client.fetch(add_request)
+            print(f'=> add to chain response was: {resp}')
+        except Exception as err:
+            print(f'=> something wrong on async add_to_chain: {err}')
+        else:
+            pass
+
 
     async def transactions(self, qs='pending', data=None):
         """pending, send
@@ -203,5 +237,5 @@ class NodeBlockChain(object):
             print(res_data)
             return res_data
         except Exception as e:
-            print(f'something wrong on send transaction: {e}')
+            print(f'something wrong on async transactions: {e}')
             return None

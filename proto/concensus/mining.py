@@ -4,11 +4,13 @@ corrutina de minería
 """
 # from tornado import gen
 import json
+from pprint import pprint
 from time import time
 from tornado import gen
 from datetime import datetime
-from concensus.blocks import create_genesis_block, Block, proof_of_work, NodeBlockChain
+from concensus.directions import get_ECDSA_keys
 from concensus.utilities import build_filesytem
+from concensus.blocks import create_genesis_block, Block, proof_of_work, NodeBlockChain
 
 
 async def mining_process(node_name, *args, **kwargs):
@@ -17,12 +19,16 @@ async def mining_process(node_name, *args, **kwargs):
     new_block_interval = 30
     BLOCKCHAIN = NodeBlockChain(node_name)
     block_number = 0
+    NODE_KEYS = get_ECDSA_keys(node_name)
+    MINER_ADDRESS = NODE_KEYS['data']['public_key']
+
     while True:
         """Mining is the only way that new coins can be created.
         In order to prevent too many coins to be created, the process
         is slowed down by a proof of work algorithm.
         """
         start_dt = datetime.now()
+        await gen.sleep(3)
         print(f'=> doing {block_number} block')
         block_number += 1
         # Get the last proof of work
@@ -31,7 +37,8 @@ async def mining_process(node_name, *args, **kwargs):
         if not last_block:
             await gen.sleep(0.5)
             continue
-        last_proof = last_block['data']['proof-of-work']
+        pprint(last_block)
+        last_proof = last_block.data['proof-of-work']
         # Find the proof of work for the current block being mined
         # Note: The program will hang here until a new proof of work is found
         proof = proof_of_work(last_proof, BLOCKCHAIN)
@@ -69,7 +76,7 @@ async def mining_process(node_name, *args, **kwargs):
             NODE_PENDING_TRANSACTIONS = []
             # Now create the new block
             mined_block = Block(new_block_index, new_block_timestamp, new_block_data, last_block_hash)
-            BLOCKCHAIN.append(mined_block)
+            await BLOCKCHAIN.add_to_chain(mined_block)
             # Let the client know this node mined a block
             print({
               "index": new_block_index,

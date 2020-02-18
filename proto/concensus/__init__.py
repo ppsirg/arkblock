@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import json
+from pprint import pprint
 from tinydb import TinyDB
 from tornado.web import Application, RequestHandler
 # from concensus.directions import *
+from settings import get_config
 from concensus.blocks import start_db
 from concensus.utilities import build_filesytem
+
 
 class chainBaseHandler(RequestHandler):
     """Clase base."""
@@ -29,7 +33,7 @@ class blockHandler(chainBaseHandler):
     def get_block(self, query=None):
         """retorna bloques del registro, puede retornar: todos, uno por id,
         y en un rango cerrado"""
-        print(f'=> abriendo base de datos en: {self.db_file}')
+        print(f'=> abriendo base de datos en: {self.db_file} para leer')
         with TinyDB(self.db_file) as db:
             if not query:
                 data = db.all()
@@ -39,12 +43,23 @@ class blockHandler(chainBaseHandler):
                     pass
                 return None
 
+    def add_block(self, block_dict):
+        print(f'=> abriendo base de datos en: {self.db_file} para agregar')
+        with TinyDB(self.db_file) as db:
+            db.insert(block_dict)
+
     def get(self, *args, **kwargs):
         print(args)
         print(kwargs)
         # serializar blockchain
         response = self.get_block()
         self.write({'blocks': response})
+
+    def post(self, *args, **kwargs):
+        block_dict = json.loads(self.request.body)
+        pprint(block_dict)
+        self.add_block(block_dict)
+        self.write({'status': 'block_added'})
 
 
 class transactionHandler(chainBaseHandler):

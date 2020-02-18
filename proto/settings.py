@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Configuraciones del nodo.
 """
-# import json
 import os
+import json
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -24,3 +24,14 @@ PEER_NODES = ['https://localhost:8888']
 #     key_data = json.load(f)
 #
 # MINER_ADDRESS = key_data['public_key']
+
+def save_config(node_name, host, port):
+    with open(os.path.join(BASE_DIR, node_name, f'config_{node_name}.json'), 'a+') as f:
+        config = {'node_name':node_name, 'host': host, 'port': port}
+        json.dump(config, f)
+
+
+def get_config(node_name):
+    with open(os.path.join(BASE_DIR, node_name, f'config_{node_name}.json'), 'r') as f:
+        info = f.read()
+    return info

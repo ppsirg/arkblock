@@ -9,7 +9,7 @@ from tornado.queues import Queue
 from tornado.locks import Event
 from tornado.options import define, parse_command_line, options
 
-
+from settings import save_config
 from concensus import make_blockchain_app
 from concensus.mining import mining_process
 
@@ -29,6 +29,7 @@ def main():
     node_name = options.node_name
     app = make_blockchain_app(node_name)
     http_server = tornado.httpserver.HTTPServer(app)
+    save_config(node_name, host, port)
     # launch listener server
     http_server.listen(port)
     logging.warning(f"Listening http on {host}:{port}...")
