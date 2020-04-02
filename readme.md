@@ -10,18 +10,18 @@ Blockchain es un tipo de sistema que se compone de dos principios basicos:
 blockchain se compone de un conjunto de nodos de tal manera que cada uno de ellos
 puede comportarse a la vez como cliente o servidor, usualmente con propiedades de
 descubrimiento de nodos, por lo cual cada miembro de la red puede ser conocido por
-los demás, aumentando la capacidad de la red para estar disponible a peticiones.
+los demas, aumentando la capacidad de la red para estar disponible a peticiones.
 
 ## almacenamiento gestionado por concenso
 
-en blockchain cada nodo completo posee una copia completa de la información del
+en blockchain cada nodo completo posee una copia completa de la informacion del
 sistema. para asegurar que cada copia es integra, la manera de gestionar la
-información en la misma es a través de un algoritmo de concenso.
+informacion en la misma es a traves de un algoritmo de concenso.
 
-estos algoritmos de concenso se basan usualmente en una competencia matemática
-entre los diferentes nodos para organizar la información en paquetes llamados
+estos algoritmos de concenso se basan usualmente en una competencia matematica
+entre los diferentes nodos para organizar la informacion en paquetes llamados
 bloques, los cuales dependen matematicamente unos de otros, haciendo que cada
-bloque tenga a su vez la información suficiente para validar los datos anteriores,
+bloque tenga a su vez la informacion suficiente para validar los datos anteriores,
 lo cual hace que un atacante que quiera modificar un bloque determinado, tenga
 que modificar una cantidad _n_ de bloques que va aumentando conforme pasa el tiempo,
 lo que aumenta la dificultad de calculo de manera exponencial.
@@ -34,12 +34,12 @@ supuestos:
 
 - no es posible tener el control del resto de participantes del sistema o
 confiar en que el resto de participantes de un sistema no van a intentar
-falsificar o corromper la información (zero trust systems)
+falsificar o corromper la informacion (zero trust systems)
 - se necesita alta disponibilidad, redundancia y tolerancia a fallos
 - puede permitirse altos tiempos de respuesta no-deterministicos y uso excesivo
-de almacenamiento y recursos, así como de ancho de banda
+de almacenamiento y recursos, asi­ como de ancho de banda
 - los interesados del sistema se benefician de tener copias locales del sistema
-- la verificación de eventos en el tiempo es un requisito critico
+- la verificacion de eventos en el tiempo es un requisito critico
 - necesitas monetizar completamente su uso
 
 ## debilidades
@@ -55,20 +55,21 @@ de almacenamiento y recursos, así como de ancho de banda
 
 - buscar diferentes algoritmos de concenso
 
-## Ejemplos de protocolos de consenso (https://es.wikipedia.org/wiki/Problema_del_consenso)
-Se han elaborado distintos protocolos o algoritmos que solucionan este tipo de problemas. 
-Cada uno se aplica para cierto tipo de entornos y tienen sus propias características. Veamos algunos ejemplos:
+## Ejemplos de protocolos de consenso 
 
-Commit de dos fases
-Commit de tres fases
-Raft
-Paxos y Multipaxos
-Prueba de trabajo
-Prueba de participación tanto en su versión original como en la versión prueba de participación delegada.
-Prueba de quemadura
-Algoritmo de consenso Protocolo Ripple. Es el usado en Ripple y Stellar
-Zookeeper Atomic Broadcast
-Viewstamped replication
+Se han elaborado distintos protocolos o algoritmos que solucionan este tipo de problemas (https://es.wikipedia.org/wiki/Problema_del_consenso). 
+Cada uno se aplica para cierto tipo de entornos y tienen sus propias caracteristicas. Veamos algunos ejemplos:
+
+- Commit de dos fases
+- Commit de tres fases
+- Raft
+- Paxos y Multipaxos
+- Prueba de trabajo
+- Prueba de participacion tanto en su version original como en la version prueba de participacion delegada.
+- Prueba de quemadura
+- Algoritmo de consenso Protocolo Ripple. Es el usado en Ripple y Stellar
+- Zookeeper Atomic Broadcast
+- Viewstamped replication
 
 ## elances de interes
 
