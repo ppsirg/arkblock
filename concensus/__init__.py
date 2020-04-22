@@ -71,11 +71,11 @@ class blockHandler(chainBaseHandler):
 class transactionHandler(chainBaseHandler):
     """Maneja las transacciones."""
 
-    def get(self, *args, **kwargs):
+    async def get(self, *args, **kwargs):
         """Retorna transacciones sin procesar"""
-        self.write({'response': 'got it'})
+        self.write({'pending': []})
 
-    def post(self, *args, **kwargs):
+    async def post(self, *args, **kwargs):
         """Recibe transacciones de otros nodos de la red"""
         self.write({'response': 'posted it'})
 
