@@ -71,12 +71,17 @@ class blockHandler(chainBaseHandler):
 class transactionHandler(chainBaseHandler):
     """Maneja las transacciones."""
 
+    txion_pool = []
+
     async def get(self, *args, **kwargs):
         """Retorna transacciones sin procesar"""
-        self.write({'pending': []})
+        self.write({'pending': transactionHandler.txion_pool})
+        transactionHandler.txion_pool = []
 
     async def post(self, *args, **kwargs):
         """Recibe transacciones de otros nodos de la red"""
+        txion = json.loads(self.request.body)
+        transactionHandler.txion_pool.append(txion)
         self.write({'response': 'posted it'})
 
 

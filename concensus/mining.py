@@ -6,21 +6,25 @@ import json
 from pprint import pprint
 from time import time
 from tornado import gen
+from tornado.httpclient import AsyncHTTPClient
 from datetime import datetime
 from concensus.directions import get_ECDSA_keys
 from concensus.chain import NodeBlockChain, proof_of_work
 from concensus.data_structure import Block
+from settings import get_config
 
 
 async def mining_process(node_name, *args, **kwargs):
     """proceso de minería
     """
-    new_block_interval = 100
+    new_block_interval = 10
     BLOCKCHAIN = NodeBlockChain(node_name)
     block_number = 0
     NODE_KEYS = get_ECDSA_keys(node_name)
     MINER_ADDRESS = NODE_KEYS['data']['public_key']
     NODE_PENDING_TRANSACTIONS = {'pending':[]}
+    MINER_CONFIG = json.loads(get_config(node_name))
+    MINER_NODE_URL = 'http://{host}:{port}'.format(**MINER_CONFIG)
 
     while True:
         """Mining is the only way that new coins can be created.
@@ -51,6 +55,10 @@ async def mining_process(node_name, *args, **kwargs):
             # First we load all pending transactions sent to the node server
             # NODE_PENDING_TRANSACTIONS = '{"pending": []}'
             # Then we add the mining reward
+            cl = AsyncHTTPClient()
+            raw = await cl.fetch(f'{MINER_NODE_URL}/txion/')
+            data = json.loads(raw.body)
+            NODE_PENDING_TRANSACTIONS['pending'] = data['pending']
             NODE_PENDING_TRANSACTIONS['pending'].append({
                 "from": "network",
                 "to": MINER_ADDRESS,

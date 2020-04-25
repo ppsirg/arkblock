@@ -10,7 +10,7 @@
       :per-page="perPage"
       :striped="true"
       :hoverable="true"
-      default-sort="name"
+      default-sort="index"
       :data="clients">
 
       <template slot-scope="props">
@@ -108,6 +108,7 @@ export default {
             type: 'is-danger'
           })
         })
+      window.setInterval(this.get_chain_updates, 3000)
     }
   },
   methods: {
@@ -124,6 +125,27 @@ export default {
     },
     trashCancel () {
       this.isModalActive = false
+    },
+    get_chain_updates () {
+      axios
+        .get(this.blockchainURL)
+        .then(r => {
+          this.isLoading = false
+          console.log({ r: r.data.blocks })
+          if (r.data && r.data.blocks) {
+            if (r.data.blocks.length > this.perPage) {
+              this.paginated = true
+            }
+            this.clients = r.data.blocks
+          }
+        })
+        .catch(e => {
+          this.isLoading = false
+          this.$buefy.toast.open({
+            message: `Error: ${e.message}`,
+            type: 'is-danger'
+          })
+        })
     }
   }
 }
